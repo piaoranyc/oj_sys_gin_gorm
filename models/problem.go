@@ -1,6 +1,7 @@
 package models
 
 import (
+	"fmt"
 	"gorm.io/gorm"
 )
 
@@ -16,4 +17,14 @@ type Problem struct {
 
 func (table *Problem) TableName() string {
 	return "problem"
+}
+
+func GetProblemList(keyword string) {
+
+	data := make([]*Problem, 0)
+	DB.Find(&data)
+	for _, v := range data {
+		fmt.Printf("problem ==>%v\n", v)
+
+	}
 }
