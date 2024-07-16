@@ -2,5 +2,5 @@ package define
 
 var (
 	DefaultPage = "1"
-	DefaultSize = "10"
+	DefaultSize = "2"
 )
