@@ -30,7 +30,7 @@ const docTemplate = `{
                     },
                     {
                         "type": "integer",
-                        "description": "请输入当前页,默认第二页",
+                        "description": "请输入当前页,默认第一页",
                         "name": "page",
                         "in": "query"
                     },
@@ -38,6 +38,12 @@ const docTemplate = `{
                         "type": "integer",
                         "description": "size",
                         "name": "size",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "分类的唯一标识",
+                        "name": "category_identity",
                         "in": "query"
                     }
                 ],

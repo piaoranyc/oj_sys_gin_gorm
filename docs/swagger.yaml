@@ -8,7 +8,7 @@ paths:
         in: query
         name: keyword
         type: string
-      - description: 请输入当前页,默认第二页
+      - description: 请输入当前页,默认第一页
         in: query
         name: page
         type: integer
@@ -16,6 +16,10 @@ paths:
         in: query
         name: size
         type: integer
+      - description: 分类的唯一标识
+        in: query
+        name: category_identity
+        type: string
       responses:
         "200":
           description: '{"code":"200","msg":,"",data:""}'
