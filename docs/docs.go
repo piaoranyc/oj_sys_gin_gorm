@@ -23,8 +23,14 @@ const docTemplate = `{
                 "summary": "问题列表",
                 "parameters": [
                     {
+                        "type": "string",
+                        "description": "keyword",
+                        "name": "keyword",
+                        "in": "query"
+                    },
+                    {
                         "type": "integer",
-                        "description": "请输入当前页,默认第一页",
+                        "description": "请输入当前页,默认第二页",
                         "name": "page",
                         "in": "query"
                     },

@@ -4,7 +4,7 @@ import (
 	"gorm.io/gorm"
 )
 
-type Problem struct {
+type ProblemBasic struct {
 	gorm.Model
 	Identity   string `gorm:"column:identity;type:varchar(36);" json:"identity"` // 问题表的唯一标识
 	Title      string `gorm:"column:title;type:varchar(255);" json:"title"`      // 文章标题
@@ -14,12 +14,12 @@ type Problem struct {
 	CategoryId string `gorm:"column:category_id;type:varchar(255);" json:"category_id"`
 }
 
-func (table *Problem) TableName() string {
-	return "problem"
+func (table *ProblemBasic) TableName() string {
+	return "problem_basic"
 }
 
 func GetProblemList(keyword string) *gorm.DB {
-	return DB.Model(new(Problem)).
+	return DB.Model(new(ProblemBasic)).
 		Where("title like ? OR content like ?", "%"+keyword+"%", "%"+keyword+"%")
 
 }

@@ -4,7 +4,11 @@ paths:
   /problem_list:
     get:
       parameters:
-      - description: 请输入当前页,默认第一页
+      - description: keyword
+        in: query
+        name: keyword
+        type: string
+      - description: 请输入当前页,默认第二页
         in: query
         name: page
         type: integer
