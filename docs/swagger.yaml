@@ -1,6 +1,5 @@
 info:
-  title: Sample API  # API的标题
-  version: 0.0.1   # API的版本号
+  contact: {}
 paths:
   /problem_detail:
     get:
@@ -42,6 +41,21 @@ paths:
           schema:
             type: string
       summary: 问题列表
+      tags:
+      - 公共方法
+  /user_detail:
+    get:
+      parameters:
+      - description: user identity
+        in: query
+        name: identity
+        type: string
+      responses:
+        "200":
+          description: '{"code":"200","msg":,"",data:""}'
+          schema:
+            type: string
+      summary: 用户详情
       tags:
       - 公共方法
 swagger: "2.0"
