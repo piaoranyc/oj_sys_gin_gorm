@@ -1,7 +1,9 @@
 package service
 
 import (
+	"errors"
 	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
 	"log"
 	"net/http"
 	"oj/define"
@@ -48,4 +50,40 @@ func GetProblemList(context *gin.Context) {
 		},
 	})
 
+}
+
+// GetProblemDetail
+// @Tags         公共方法
+// @Summary      问题详情
+// @Param        identity   query   string  false  "problem identity"
+// @Success      200  string json "{"code":"200","msg":,"",data:""}"
+// @Router       /problem_detail [get]
+func GetProblemDetail(context *gin.Context) {
+	identity := context.Query("identity")
+	if identity == "" {
+		context.JSON(http.StatusOK, gin.H{
+			"code": -1,
+			"msg":  "问题唯一标识不能为空",
+		})
+		return
+	}
+	data := new(models.ProblemBasic)
+	err := models.DB.Where("identity=?", identity).First(&data).Error
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			context.JSON(http.StatusOK, gin.H{
+				"code": -1,
+				"msg":  "问题不存在",
+			})
+		}
+		context.JSON(http.StatusOK, gin.H{
+			"code": -1,
+			"msg":  "GetProblemDetail ERROR" + err.Error(),
+		})
+	}
+
+	context.JSON(http.StatusOK, gin.H{
+		"code": 200,
+		"data": data,
+	})
 }
