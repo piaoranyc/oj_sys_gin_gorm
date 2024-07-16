@@ -31,7 +31,7 @@ func GetProblemList(context *gin.Context) {
 	page = (page - 1) * size
 	var count int64
 	keyword := context.Query("keyword")
-	list := make([]*models.Problem, 0)
+	list := make([]*models.ProblemBasic, 0)
 	tx := models.GetProblemList(keyword)
 	err = tx.Count(&count).Omit("content").Offset(page).Limit(size).Find(&list).Error
 	if err != nil {
