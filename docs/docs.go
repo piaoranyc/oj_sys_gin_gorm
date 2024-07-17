@@ -81,6 +81,54 @@ const docTemplate = `{
                 }
             }
         },
+        "/submit_list": {
+            "get": {
+                "tags": [
+                    "公共方法"
+                ],
+                "summary": "提交列表",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "problem_identity",
+                        "name": "problem_identity",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "请输入当前页,默认第一页",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "size",
+                        "name": "size",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "user_identity",
+                        "name": "user_identity",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "status",
+                        "name": "status",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{\"code\":\"200\",\"msg\":,\"\",data:\"\"}",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
         "/user_detail": {
             "get": {
                 "tags": [
