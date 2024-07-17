@@ -1,6 +1,25 @@
 info:
   contact: {}
 paths:
+  /login:
+    post:
+      parameters:
+      - description: username
+        in: formData
+        name: username
+        type: string
+      - description: password
+        in: formData
+        name: password
+        type: string
+      responses:
+        "200":
+          description: '{"code":"200","msg":,"",data:""}'
+          schema:
+            type: string
+      summary: 用户登录
+      tags:
+      - 公共方法
   /problem_detail:
     get:
       parameters:

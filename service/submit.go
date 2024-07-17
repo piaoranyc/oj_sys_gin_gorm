@@ -47,6 +47,7 @@ func GetSubmitList(context *gin.Context) {
 	context.JSON(http.StatusOK, gin.H{
 		"msg": 200,
 		"data": map[string]interface{}{
+			"code":  200,
 			"list":  list,
 			"count": count,
 		},
