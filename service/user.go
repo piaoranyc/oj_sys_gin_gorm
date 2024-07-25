@@ -53,7 +53,7 @@ func Login(context *gin.Context) {
 	if username == "" || password == "" {
 		context.JSON(200, gin.H{
 			"code": -1,
-			"msg":  "login fail",
+			"msg":  "必填信息内容为空",
 		})
 	}
 	password = help.GetMd5(password)

@@ -14,7 +14,7 @@ func TestGormTest(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	data := make([]*models.Problem, 0)
+	data := make([]*models.ProblemBasic, 0)
 	err = db.Find(&data).Error
 	if err != nil {
 		t.Fatal(err)
@@ -22,4 +22,5 @@ func TestGormTest(t *testing.T) {
 	for _, v := range data {
 		fmt.Println("problem ==>", v)
 	}
+	//eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZGVudGl0eSI6IjEyMzQ1NiIsIm5hbWUiOiJnZXQifQ.Ci9M7QJuHdTlt2q4XyGm4tRso4Los45ca8ii0NhseOM
 }
