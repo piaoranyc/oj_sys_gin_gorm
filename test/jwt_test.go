@@ -28,8 +28,20 @@ func TestGenJwt(t *testing.T) {
 
 	}
 	fmt.Println(tokenString)
+	//eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZGVudGl0eSI6IjEyMzQ1NiIsIm5hbWUiOiJnZXQifQ.Ci9M7QJuHdTlt2q4XyGm4tRso4Los45ca8ii0NhseOM
 }
 
 func TestAnalyseToken(t *testing.T) {
+	tokenString := "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZGVudGl0eSI6IjEyMzQ1NiIsIm5hbWUiOiJnZXQifQ.Ci9M7QJuHdTlt2q4XyGm4tRso4Los45ca8ii0NhseOM"
+	userClaim := UserClaims{}
+	claims, err := jwt.ParseWithClaims(tokenString, &userClaim, func(token *jwt.Token) (interface{}, error) {
+		return myKey, nil
+	})
+	if err != nil {
+		t.Error(err)
 
+	}
+	if claims.Valid {
+		fmt.Println(userClaim)
+	}
 }
