@@ -8,12 +8,15 @@ import (
 	"github.com/jordan-wright/email"
 	uuid "github.com/satori/go.uuid"
 	"log"
+	"math/rand"
 	"net/smtp"
+	"strconv"
 )
 
 type UserClaims struct {
 	Identity string `json:"identity"`
 	Name     string `json:"name"`
+	IsAdmin  int    `json:"is_admin"`
 	jwt.StandardClaims
 }
 
@@ -23,10 +26,11 @@ func GetMd5(s string) string {
 
 var myKey = []byte("gingormkey")
 
-func GenerateJwt(identity string, name string) (string, error) {
+func GenerateJwt(identity string, name string, isAdmin int) (string, error) {
 	userClaim := UserClaims{
 		Identity:       identity,
 		Name:           name,
+		IsAdmin:        isAdmin,
 		StandardClaims: jwt.StandardClaims{},
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, userClaim)
@@ -67,4 +71,12 @@ func SendCode(toUserEmail string, code string) error {
 }
 func GetUUID() string {
 	return uuid.NewV4().String()
+}
+func GenerateCode() string {
+	res := ""
+	for i := 0; i < 6; i++ {
+		res += strconv.Itoa(rand.Intn(10))
+	}
+	return res
+
 }

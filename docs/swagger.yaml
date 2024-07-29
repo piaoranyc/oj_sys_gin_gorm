@@ -20,6 +20,49 @@ paths:
       summary: 用户登录
       tags:
       - 公共方法
+  /problem-create:
+    post:
+      parameters:
+      - description: authorization
+        in: header
+        name: authorization
+        required: true
+        type: string
+      - description: title
+        in: formData
+        name: title
+        required: true
+        type: string
+      - description: content
+        in: formData
+        name: content
+        required: true
+        type: string
+      - description: max_runtime
+        in: formData
+        name: max_runtime
+        type: integer
+      - description: max_mem
+        in: formData
+        name: max_mem
+        type: integer
+      - description: category_ids
+        in: formData
+        name: category_ids
+        type: array
+      - description: test_case
+        in: formData
+        name: test_cases
+        required: true
+        type: array
+      responses:
+        "200":
+          description: '{"code":"200","msg":,"",data:""}'
+          schema:
+            type: string
+      summary: 问题创建
+      tags:
+      - 管理员私有方法
   /problem_detail:
     get:
       parameters:
@@ -60,6 +103,68 @@ paths:
           schema:
             type: string
       summary: 问题列表
+      tags:
+      - 公共方法
+  /rank-list:
+    get:
+      parameters:
+      - description: keyword
+        in: query
+        name: keyword
+        type: string
+      - description: 请输入当前页,默认第一页
+        in: query
+        name: page
+        type: integer
+      - description: size
+        in: query
+        name: size
+        type: integer
+      - description: 分类的唯一标识
+        in: query
+        name: category_identity
+        type: string
+      responses:
+        "200":
+          description: '{"code":"200","msg":,"",data:""}'
+          schema:
+            type: string
+      summary: 排行榜
+      tags:
+      - 公共方法
+  /register:
+    post:
+      parameters:
+      - description: mail
+        in: formData
+        name: mail
+        required: true
+        type: string
+      - description: code
+        in: formData
+        name: code
+        required: true
+        type: string
+      - description: name
+        in: formData
+        name: name
+        required: true
+        type: string
+      - description: password
+        in: formData
+        name: password
+        required: true
+        type: string
+      - description: phone
+        in: formData
+        name: phone
+        type: string
+      responses:
+        "200":
+          description: '{"code":"200","msg":,"",data:""}'
+          schema:
+            type: string
+      summary: 用户注册
       tags:
       - 公共方法
   /send-code:

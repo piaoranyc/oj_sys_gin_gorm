@@ -5,8 +5,12 @@ import (
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 	"log"
+	"net/http"
+	"oj/define"
 	"oj/help"
 	"oj/models"
+	"strconv"
+	"time"
 )
 
 // GetUserDetail
@@ -74,7 +78,7 @@ func Login(context *gin.Context) {
 		})
 		return
 	}
-	token, err := help.GenerateJwt(data.Identity, data.Name)
+	token, err := help.GenerateJwt(data.Identity, data.Name, data.IsAdmin)
 	if err != nil {
 		context.JSON(200, gin.H{
 			"code": -1,
@@ -111,7 +115,8 @@ func SendCode(context *gin.Context) {
 
 	}
 
-	code := "12345"
+	code := help.GenerateCode()
+	models.RDB.Set(context, email, code, time.Second*300)
 	err := help.SendCode(email, code)
 	if err != nil {
 		context.JSON(200, gin.H{
@@ -129,7 +134,7 @@ func SendCode(context *gin.Context) {
 // Register
 // @Tags         公共方法
 // @Summary      用户注册
-// @Param        email   formData   string  true  "email"
+// @Param        mail   formData   string  true  "mail"
 // @Param        code   formData   string  true  "code"
 // @Param        name   formData   string  true  "name"
 // @Param        password   formData   string  true  "password"
@@ -145,15 +150,15 @@ func Register(context *gin.Context) {
 		})
 		return
 	}
-	code := context.PostForm("code")
-	if code == "" {
+	userCode := context.PostForm("code")
+	if userCode == "" {
 		context.JSON(200, gin.H{
 			"code": -1,
 			"msg":  "验证码为空",
 		})
 		return
 	}
-	name := context.PostForm("nama")
+	name := context.PostForm("name")
 	if name == "" {
 		context.JSON(200, gin.H{
 			"code": -1,
@@ -170,12 +175,108 @@ func Register(context *gin.Context) {
 		return
 	}
 	phone := context.PostForm("phone")
-	code, err := models.RDB.Get(context, mail).Result()
+	sysCode, err := models.RDB.Get(context, mail).Result()
 	if err != nil {
+		log.Println(err)
 		context.JSON(200, gin.H{
 			"code": -1,
 			"msg":  err.Error() + "获取验证码错误",
 		})
 		return
 	}
+	if sysCode != userCode {
+		context.JSON(200, gin.H{
+			"code": -1,
+			"msg":  "验证码错误",
+		})
+		return
+	}
+	var count int64
+	err = models.DB.Where("mail = ?", mail).Model(new(models.UserBasic)).Count(&count).Error
+	if err != nil {
+		context.JSON(200, gin.H{
+			"code": -1,
+			"msg":  err.Error() + "获取数据失败",
+		})
+		return
+	}
+	if count > 0 {
+		context.JSON(200, gin.H{
+			"code": 200,
+			"msg":  "该游戏已经被注册",
+		})
+		return
+	}
+	data := models.UserBasic{
+		Identity: help.GetUUID(),
+		Name:     name,
+		Password: help.GetMd5(password),
+		Phone:    phone,
+		Mail:     mail,
+	}
+	err = models.DB.Create(&data).Error
+	if err != nil {
+		context.JSON(200, gin.H{
+			"code": -1,
+			"msg":  err.Error() + "创建用户错误",
+		})
+		return
+	}
+	//生成token
+	jwt, err := help.GenerateJwt(data.Identity, data.Name, data.IsAdmin)
+	if err != nil {
+		context.JSON(200, gin.H{
+			"code": -1,
+			"msg":  "generate token fail" + err.Error(),
+		})
+		return
+	}
+
+	context.JSON(200, gin.H{
+		"code": 200,
+		"data": map[string]interface{}{
+			"token": jwt,
+		},
+	})
+}
+
+// GetRankList
+// @Tags         公共方法
+// @Summary      排行榜
+// @Param        keyword   query   string  false  "keyword"
+// @Param        page   query      int  false  "请输入当前页,默认第一页"
+// @Param        size   query      int  false  "size"
+// @Param        category_identity   query    string  false  "分类的唯一标识"
+// @Success      200  string json "{"code":"200","msg":,"",data:""}"
+// @Router       /rank-list [get]
+func GetRankList(context *gin.Context) {
+	page, err := strconv.Atoi(context.DefaultQuery("page", define.DefaultPage))
+	if err != nil {
+		log.Println(err)
+		return
+	}
+	size, err := strconv.Atoi(context.DefaultQuery("size", define.DefaultSize))
+	if err != nil {
+		log.Println(err)
+		return
+	}
+	page = (page - 1) * size
+	var count int64
+
+	list := make([]*models.UserBasic, 0)
+	err = models.DB.Model(new(models.UserBasic)).Count(&count).Order("finish_problem_num DESC, submit_num ASC").
+		Offset(page).Limit(size).Find(&list).Error
+	if err != nil {
+		context.JSON(200, gin.H{
+			"code": -1,
+			"msg":  err.Error() + "get rank list fail",
+		})
+	}
+	context.JSON(http.StatusOK, gin.H{
+		"msg": 200,
+		"data": map[string]interface{}{
+			"list":  list,
+			"count": count,
+		},
+	})
 }
