@@ -1,6 +1,166 @@
 info:
   contact: {}
 paths:
+  /admin/category_create:
+    post:
+      parameters:
+      - description: authorization
+        in: header
+        name: authorization
+        required: true
+        type: string
+      - description: name
+        in: formData
+        name: name
+        required: true
+        type: string
+      - description: parentId
+        in: formData
+        name: parentId
+        type: string
+      responses:
+        "200":
+          description: '{"code":"200","msg":,"",data:""}'
+          schema:
+            type: string
+      summary: 问题创建
+      tags:
+      - 管理员私有方法
+  /admin/category_delete:
+    delete:
+      parameters:
+      - description: authorization
+        in: header
+        name: authorization
+        required: true
+        type: string
+      - description: identity
+        in: query
+        name: identity
+        required: true
+        type: string
+      responses:
+        "200":
+          description: '{"code":"200","msg":,"",data:""}'
+          schema:
+            type: string
+      summary: 分类删除
+      tags:
+      - 管理员私有方法
+  /admin/category_list:
+    get:
+      parameters:
+      - description: authorization
+        in: header
+        name: authorization
+        required: true
+        type: string
+      - description: keyword
+        in: query
+        name: keyword
+        type: string
+      - description: 请输入当前页,默认第一页
+        in: query
+        name: page
+        type: integer
+      - description: size
+        in: query
+        name: size
+        type: integer
+      responses:
+        "200":
+          description: '{"code":"200","msg":,"",data:""}'
+          schema:
+            type: string
+      summary: 分类列表
+      tags:
+      - 管理员私有方法
+  /admin/category_modify:
+    put:
+      parameters:
+      - description: authorization
+        in: header
+        name: authorization
+        required: true
+        type: string
+      - description: identity
+        in: formData
+        name: identity
+        required: true
+        type: string
+      - description: name
+        in: formData
+        name: name
+        required: true
+        type: string
+      - description: parentId
+        in: formData
+        name: parentId
+        type: string
+      responses:
+        "200":
+          description: '{"code":"200","msg":,"",data:""}'
+          schema:
+            type: string
+      summary: 问题修改
+      tags:
+      - 管理员私有方法
+  /admin/problem_modify:
+    put:
+      parameters:
+      - description: authorization
+        in: header
+        name: authorization
+        required: true
+        type: string
+      - description: identity
+        in: formData
+        name: identity
+        required: true
+        type: string
+      - description: title
+        in: formData
+        name: title
+        required: true
+        type: string
+      - description: content
+        in: formData
+        name: content
+        required: true
+        type: string
+      - description: max_runtime
+        in: formData
+        name: max_runtime
+        required: true
+        type: integer
+      - description: max_mem
+        in: formData
+        name: max_mem
+        required: true
+        type: integer
+      - collectionFormat: multi
+        description: category_ids
+        in: formData
+        items:
+          type: string
+        name: category_ids
+        type: array
+      - collectionFormat: multi
+        description: test_cases
+        in: formData
+        items:
+          type: string
+        name: test_cases
+        required: true
+        type: array
+      responses:
+        "200":
+          description: '{"code":"200","msg":,"",data:""}'
+          schema:
+            type: string
+      summary: 问题修改
+      tags:
+      - 管理员私有方法
   /login:
     post:
       parameters:
@@ -50,7 +210,7 @@ paths:
         in: formData
         name: category_ids
         type: array
-      - description: test_case
+      - description: test_cases
         in: formData
         name: test_cases
         required: true

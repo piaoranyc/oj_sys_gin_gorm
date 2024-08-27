@@ -99,8 +99,8 @@ func GetProblemDetail(context *gin.Context) {
 // @Param        content   formData   string  true  "content"
 // @Param        max_runtime   formData   int  false  "max_runtime"
 // @Param        max_mem   formData   int  false  "max_mem"
-// @Param        category_ids   formData   array   false  "category_ids"
-// @Param        test_cases   formData   array  true  "test_cases"
+// @Param        category_ids   formData   []string   false  "category_ids" collectionFormat(multi)
+// @Param        test_cases   formData   []string  true  "test_cases" collectionFormat(multi)
 // @Success      200  string json "{"code":"200","msg":,"",data:""}"
 // @Router       /problem-create [post]
 func ProblemCreate(context *gin.Context) {
@@ -182,6 +182,110 @@ func ProblemCreate(context *gin.Context) {
 		"data": map[string]interface{}{
 			"identity": data.Identity,
 		},
+	})
+
+}
+
+// ProblemModify
+// @Tags         管理员私有方法
+// @Summary      问题修改
+// @Param        authorization   header   string  true  "authorization"
+// @Param        identity   formData   string  true  "identity"
+// @Param        title   formData   string  true  "title"
+// @Param        content   formData   string  true  "content"
+// @Param        max_runtime   formData   int  true  "max_runtime"
+// @Param        max_mem   formData   int  true  "max_mem"
+// @Param        category_ids   formData   []string   false  "category_ids" collectionFormat(multi)
+// @Param        test_cases   formData   []string  true  "test_cases" collectionFormat(multi)
+// @Success      200  string json "{"code":"200","msg":,"",data:""}"
+// @Router       /admin/problem_modify [put]
+func ProblemModify(context *gin.Context) {
+	identity := context.PostForm("identity")
+	title := context.PostForm("title")
+	content := context.PostForm("content")
+	max_runtime, _ := strconv.Atoi(context.PostForm("max_runtime"))
+	max_mem, _ := strconv.Atoi(context.PostForm("max_mem"))
+	categoryIds := context.PostFormArray("category_ids")
+	test_cases := context.PostFormArray("test_cases")
+	if identity == "" || title == "" || content == "" || len(categoryIds) == 0 || len(test_cases) == 0 || max_runtime == 0 || max_mem == 0 {
+		context.JSON(http.StatusOK, gin.H{
+			"code": -1,
+			"msg":  "参数不能为空",
+		})
+		return
+	}
+	if err := models.DB.Transaction(func(tx *gorm.DB) error {
+		problemBasics := &models.ProblemBasic{
+			Identity:   identity,
+			Title:      title,
+			Content:    content,
+			MaxRuntime: max_runtime,
+			MaxMem:     max_mem,
+		}
+		err := tx.Where("identity=?", identity).Updates(problemBasics).Error
+		if err != nil {
+			return err
+		}
+		err = tx.Where("identity=?", identity).Find(&models.ProblemBasic{}).Error
+		if err != nil {
+			return err
+		}
+		err = tx.Where("problem_id=?", problemBasics.ID).Delete(new(models.ProblemCategory)).Error
+		if err != nil {
+			return err
+		}
+		pcs := make([]*models.ProblemCategory, 0)
+		for _, id := range categoryIds {
+			intId, _ := strconv.Atoi(id)
+			pcs = append(pcs, &models.ProblemCategory{
+				ProblemId:  problemBasics.ID,
+				CategoryId: uint(intId),
+			})
+		}
+		err = tx.Create(&pcs).Error
+		if err != nil {
+			return err
+		}
+		err = tx.Where("problem_identity=?", identity).Delete(new(models.TestCase)).Error
+		if err != nil {
+			return err
+		}
+		tcs := make([]*models.TestCase, 0)
+		for _, testcase := range test_cases {
+			caseMap := make(map[string]string)
+			err = json.Unmarshal([]byte(testcase), &caseMap)
+			if err != nil {
+				return err
+			}
+			if _, ok := caseMap["input"]; !ok {
+				return errors.New("测试案例input格式错误")
+			}
+			if _, ok := caseMap["output"]; !ok {
+				return errors.New("测试案例output格式错误")
+			}
+			tcs = append(tcs, &models.TestCase{
+				Identity:        help.GetUUID(),
+				ProblemIdentity: identity,
+				Input:           caseMap["input"],
+				Output:          caseMap["output"],
+			})
+
+		}
+		err = tx.Create(tcs).Error
+		if err != nil {
+			return err
+		}
+		return nil
+	}); err != nil {
+		context.JSON(http.StatusOK, gin.H{
+			"code": -1,
+			"msg":  "problem modify error" + err.Error(),
+		})
+	}
+
+	context.JSON(http.StatusOK, gin.H{
+		"code": 200,
+		"msg":  "问题修改success",
 	})
 
 }

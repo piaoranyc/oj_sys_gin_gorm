@@ -22,7 +22,7 @@ func AuthAdminCheck() gin.HandlerFunc {
 			context.Abort()
 			context.JSON(http.StatusOK, gin.H{
 				"code":    http.StatusUnauthorized,
-				"message": err.Error() + "forbidden",
+				"message": "forbidden",
 			})
 			return
 		}
